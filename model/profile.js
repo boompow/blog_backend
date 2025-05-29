@@ -1,1 +1,0 @@
-import dbConnect from "../dbConnect";
