@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 import "dotenv/config";
 
 const dbConnect = async () => {
-  mongoose.connect(process.env.DB);
+  mongoose.connect(process.env.MONGODB_URI);
 
   mongoose.connection.on("connected", () => {
-    console.log("200: connected successfully!");
+    console.log("200: connected to MongoDB Atlas successfully!");
   });
 
   mongoose.connection.on("error", (err) => {
