@@ -15,8 +15,8 @@ const userTokenSchema = new Schema(
 
     createdAt: {
       type: Date,
-      default: Date.now(),
-      expires: 30 * 86400, //30 days later refreshes token
+      default: Date.now,
+      expires: 7 * 86400, //7 days later refreshes token
     },
   },
   {

@@ -20,16 +20,6 @@ const userSchema = new Schema(
       minlength: 1,
     },
 
-    username: {
-      type: String,
-      unique: true,
-      required: true,
-      trim: true,
-      lowercase: true,
-      minlength: 3,
-      maxlength: 30,
-    },
-
     slug: {
       unique: true,
       type: String,
@@ -40,6 +30,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
       validate: {
         validator: validator.isEmail,
         message: "Please enter a valid email address",
@@ -80,9 +71,9 @@ const userSchema = new Schema(
 
 // slugify the username
 userSchema.pre("save", function (next) {
-  if (this.isModified("username")) {
-    const baseSlug = slugify(this.username, { lower: true, strict: true });
-    this.slug = `${baseSlug}-${nanoid(8)}`;
+  if (this.isModified("email")) {
+    const baseSlug = slugify(this.name, { lower: true, strict: true });
+    this.slug = `${baseSlug}-${nanoid(8)}`; //this needs to be sanitized and check for duplicate slug
   }
   next();
 });

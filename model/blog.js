@@ -57,6 +57,7 @@ const blogSchema = new Schema(
     },
     publishedAt: {
       type: Date,
+      default: Date.now,
     },
 
     // Blog status

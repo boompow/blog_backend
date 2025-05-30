@@ -21,10 +21,7 @@ const commentSchema = new Schema(
       required: true,
     },
 
-    repliedComment: {
-      type: Schema.Types.ObjectId,
-      ref: "Comment",
-    },
+    repliedComment: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   },
   {
     timestamps: true,
