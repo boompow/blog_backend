@@ -44,11 +44,11 @@ const joiCommentSchema = Joi.object({
 });
 
 const joiUserSchema = Joi.object({
-  googleID: Joi.string().required().label("Google ID"),
+  id: Joi.string().required().label("User ID"),
   name: Joi.string().trim().required().min(1).max(30).label("Name"),
   email: Joi.string().email().required().lowercase().label("email"),
   avatar: Joi.string().uri(),
-  bio: Joi.string().min(1).max(300).label("Bio"),
+  bio: Joi.string().min(0).max(300).label("Bio"),
 });
 
 const validateJoiSchema = (schema, body) => {
