@@ -32,23 +32,26 @@ const googleAuthController = async (req, res) => {
         avatar: picture,
       };
 
-      user = await User.create(userObject);
+      await User.create(userObject);
     }
 
     // generate tokens
     const accessToken = generateAccessToken({
-      id: user._id,
+      id: user._id.toString(),
       email: user.email,
     });
 
     const refreshToken = generateRefreshToken({
-      id: user._id,
+      id: user._id.toString(),
       email: user.email,
     });
 
+    console.log(accessToken);
+    console.log(refreshToken);
+
     // add the refresh token to the DB
     await UserToken.create({
-      id: user_id,
+      userId: user._id,
       token: refreshToken,
     });
 
@@ -70,6 +73,7 @@ const googleAuthController = async (req, res) => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
+        slug: user.slug,
       },
     });
   } catch (error) {

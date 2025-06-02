@@ -1,8 +1,9 @@
 import User from "../model/user.js";
-import { joiUserSchema } from "../util/schemaValidator.js";
+import { joiUserValidation } from "../util/schemaValidator.js";
 
+// For updating user profile
 const updateProfile = async (req, res) => {
-  const { error } = joiUserSchema(req.body);
+  const { error } = joiUserValidation(req.body);
 
   try {
     if (error)
@@ -30,9 +31,10 @@ const updateProfile = async (req, res) => {
   }
 };
 
+// For deleting user profile
 const deleteProfile = async (req, res) => {
   try {
-    const { error } = joiUserSchema(req.body);
+    const { error } = joiUserValidation(req.body);
     if (error) {
       return res
         .status(400)

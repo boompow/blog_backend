@@ -1,4 +1,3 @@
-import { required } from "joi";
 import { Schema, model } from "mongoose";
 import { nanoid } from "nanoid";
 import slugify from "slugify";
@@ -72,7 +71,7 @@ const userSchema = new Schema(
 );
 
 // slugify the username
-userSchema.pre("save", function (next) {
+userSchema.pre("validate", function (next) {
   if (this.isModified("email")) {
     const slugBody = this.email.match(/^([^@]+)/)[0]; // the first part of the email before the @ is used to create part of the user slug
     const baseSlug = slugify(slugBody, { lower: true, strict: true });

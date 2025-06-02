@@ -74,7 +74,7 @@ const blogSchema = new Schema(
 );
 
 // slugify the title
-blogSchema.pre("save", function (next) {
+blogSchema.pre("validate", function (next) {
   if (this.isModified("title")) {
     const baseSlug = slugify(this.title, { lower: true, strict: true });
     this.slug = `${baseSlug}-${nanoid(8)}`;

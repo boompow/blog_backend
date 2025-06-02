@@ -9,18 +9,18 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 // generate tokens
 export function generateRefreshToken(payload) {
-  jwt.set(payload, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+  return jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
 }
 
 export function generateAccessToken(payload) {
-  jwt.set(payload, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+  return jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 }
 
 // verify tokens
 export function verifyRefreshToken(token) {
-  jwt.verify(token, REFRESH_TOKEN_SECRET);
+  return jwt.verify(token, REFRESH_TOKEN_SECRET);
 }
 
 export function verifyAccessToken(token) {
-  jwt.verify(token, ACCESS_TOKEN_SECRET);
+  return jwt.verify(token, ACCESS_TOKEN_SECRET);
 }

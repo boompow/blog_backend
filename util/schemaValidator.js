@@ -26,6 +26,7 @@ const joiBlogSchema = Joi.object({
 });
 
 const joiCommentSchema = Joi.object({
+  id: Joi.string().label("comment ID"),
   comment: Joi.string().required.min(1).max(300).label("Comment"),
   author: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/) //ObjectID pattern
@@ -41,6 +42,15 @@ const joiCommentSchema = Joi.object({
     .message({
       "string pattern": "ObjectID must be 24-character hexadecimal string",
     }),
+  replies: Joi.array()
+    .items(
+      Joi.object({
+        commentID: Joi.string()
+          .pattern(/^[0-9a-fA-F]{24}$/)
+          .label("Comment reply UserID"),
+      })
+    )
+    .label("Comment Replies"),
 });
 
 const joiUserSchema = Joi.object({
@@ -49,9 +59,11 @@ const joiUserSchema = Joi.object({
   email: Joi.string().email().required().lowercase().label("email"),
   avatar: Joi.string().uri(),
   bio: Joi.string().min(0).max(300).label("Bio"),
+  slug: Joi.string().required().label("slug"),
 });
 
-const validateJoiSchema = (schema, body) => {
+// the joi schema validator function
+const validateJoi = (schema, body) => {
   const { error, value } = schema.validate(body);
   if (error) {
     throw new Error(error.details[0].message);
@@ -60,9 +72,15 @@ const validateJoiSchema = (schema, body) => {
   }
 };
 
-export default {
-  joiBlogSchema,
-  joiCommentSchema,
-  joiUserSchema,
-  validateJoiSchema,
-};
+// joi schema validators
+export function joiBlogValidation(body) {
+  return validateJoi(joiBlogSchema, body);
+}
+
+export function joiCommentValidation(body) {
+  return validateJoi(joiCommentSchema, body);
+}
+
+export function joiUserValidation(body) {
+  return validateJoi(joiUserSchema, body);
+}
