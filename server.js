@@ -3,8 +3,10 @@ import "dotenv/config";
 import cors from "cors";
 import helmet from "helmet";
 import dbConnect from "./dbConnect.js";
+import cookieParser from "cookie-parser";
 
 import authRoute from "./routes/googleAuthRoute.js";
+import profileRoute from "./routes/profileRoute.js";
 
 // init the app
 const app = express();
@@ -15,6 +17,7 @@ dbConnect();
 // setup the middleware
 // header middleware
 app.use(helmet());
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -33,6 +36,9 @@ app.get("/", (req, res) => {
 
 // test google auth
 app.use("/api/auth", authRoute);
+
+// handle profile changes
+app.use("/api/profile", profileRoute);
 
 // start the server
 const PORT = process.env.PORT || 5000;

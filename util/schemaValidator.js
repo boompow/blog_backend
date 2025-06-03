@@ -17,8 +17,11 @@ const joiBlogSchema = Joi.object({
     .pattern(/^[0-9a-fA-F]{24}$/) //ObjectID pattern
     .required()
     .label("Author ObjectID")
-    .message({
-      "string pattern": "ObjectID must be 24-character hexadecimal string",
+    .messages({
+      "string.pattern.base":
+        "Author ObjectID must be a 24-character hexadecimal string",
+      "string.empty": "Author ObjectID is required",
+      "any.required": "Author ObjectID is required",
     }),
 
   published: Joi.boolean(),
@@ -27,20 +30,26 @@ const joiBlogSchema = Joi.object({
 
 const joiCommentSchema = Joi.object({
   id: Joi.string().label("comment ID"),
-  comment: Joi.string().required.min(1).max(300).label("Comment"),
+  comment: Joi.string().required().min(1).max(300).label("Comment"),
   author: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/) //ObjectID pattern
     .required()
     .label("Author ObjectID")
-    .message({
-      "string pattern": "ObjectID must be 24-character hexadecimal string",
+    .messages({
+      "string.pattern.base":
+        "Author ObjectID must be a 24-character hexadecimal string",
+      "string.empty": "Author ObjectID is required",
+      "any.required": "Author ObjectID is required",
     }),
   blog: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .required()
     .label("Blog ObjectID")
-    .message({
-      "string pattern": "ObjectID must be 24-character hexadecimal string",
+    .messages({
+      "string.pattern.base":
+        "Blog ObjectID must be a 24-character hexadecimal string",
+      "string.empty": "Blog ObjectID is required",
+      "any.required": "Blog ObjectID is required",
     }),
   replies: Joi.array()
     .items(

@@ -1,8 +1,30 @@
 import User from "../model/user.js";
+import UserToken from "../model/userToken.js";
 import { joiUserValidation } from "../util/schemaValidator.js";
 
+// For getting user profile
+export const getProfile = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      res.status(400).json({ error: true, message: "User not found" });
+    }
+    res.status(200).json({
+      error: false,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        slug: user.slug,
+      },
+      message: "User Found!",
+    });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error });
+  }
+};
 // For updating user profile
-const updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
   const { error } = joiUserValidation(req.body);
 
   try {
@@ -32,7 +54,7 @@ const updateProfile = async (req, res) => {
 };
 
 // For deleting user profile
-const deleteProfile = async (req, res) => {
+export const deleteProfile = async (req, res) => {
   try {
     const { error } = joiUserValidation(req.body);
     if (error) {
@@ -44,11 +66,13 @@ const deleteProfile = async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
       await User.deleteOne({ email: req.body.email });
+      await UserToken.deleteOne({ userID: user._id });
     } else {
       return res.status(404).json({ error: true, message: "User not found" });
     }
 
     return res
+      .clearCookie("BLOG")
       .status(200)
       .json({ error: false, message: "Profile deleted successfuly!" });
   } catch (error) {
@@ -57,5 +81,3 @@ const deleteProfile = async (req, res) => {
       .json({ error: true, message: "can not delete profile" });
   }
 };
-
-export default { updateProfile, deleteProfile };
