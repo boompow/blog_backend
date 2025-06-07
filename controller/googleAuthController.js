@@ -23,19 +23,21 @@ const googleAuthController = async (req, res) => {
 
     // find or create the user account
     const user = await User.findOne({ email: email });
-    if (!user) {
-      // following the user schema
-      const userObject = {
-        googleID: sub,
-        name: name,
-        email: email,
-        avatar: picture,
-      };
-
-      await User.create(userObject);
+    if (user) {
+      return res.status(409).json("User already exists");
     }
+    // following the user schema
+    const userObject = {
+      googleID: sub,
+      name: name,
+      email: email,
+      avatar: picture,
+    };
+
+    await User.create(userObject);
 
     // generate tokens
+    // the mongoDB objectID must be converted to String to be JSON safe and be converted back to objectID to fetch from mongoDB
     const accessToken = generateAccessToken({
       id: user._id.toString(),
       email: user.email,
@@ -54,6 +56,9 @@ const googleAuthController = async (req, res) => {
       userId: user._id,
       token: refreshToken,
     });
+
+    const tokened = await UserToken.findOne({ userID: user._id });
+    console.log(tokened);
 
     // add the refresh token onto an httpOnly cookie
     res.cookie("BLOG", refreshToken, {

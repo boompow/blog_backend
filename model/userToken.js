@@ -13,16 +13,17 @@ const userTokenSchema = new Schema(
       required: true,
     },
 
-    createdAt: {
+    expiresAt: {
       type: Date,
-      default: Date.now,
-      expires: 7 * 86400, //7 days later refreshes token
+      required: true,
+      default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   },
   {
     timestamps: true,
   }
 );
+userTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const UserToken = model("UserToken", userTokenSchema);
 
