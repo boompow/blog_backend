@@ -56,13 +56,6 @@ export const updateProfile = async (req, res) => {
 // For deleting user profile
 export const deleteProfile = async (req, res) => {
   try {
-    const { error } = joiUserValidation(req.body);
-    if (error) {
-      return res
-        .status(400)
-        .json({ error: true, message: error.details[0].message });
-    }
-
     const user = await User.findOne({ email: req.body.email });
     if (user) {
       await User.deleteOne({ email: req.body.email });

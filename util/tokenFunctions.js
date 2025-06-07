@@ -15,12 +15,3 @@ export function generateRefreshToken(payload) {
 export function generateAccessToken(payload) {
   return jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 }
-
-// verify tokens
-export function verifyRefreshToken(token) {
-  return jwt.verify(token, REFRESH_TOKEN_SECRET);
-}
-
-export function verifyAccessToken(token) {
-  return jwt.verify(token, ACCESS_TOKEN_SECRET);
-}
