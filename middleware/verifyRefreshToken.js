@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 export async function verifyRefreshToken(req, res, next) {
-  const refreshCookie = req.cookies.BLOG;
+  const refreshCookie = req.cookies.BLG;
 
   if (!refreshCookie) {
     return res
@@ -28,31 +28,31 @@ export async function verifyRefreshToken(req, res, next) {
     }
     // lets convert the String version of the user ID to mongoDB objectID to fetch userToken with userID
     const objectID = new mongoose.Types.ObjectId(userPayload.id);
-    console.log(objectID);
 
     const user = await UserToken.findOne({ userId: objectID });
     if (!user) {
       return res.status(403).json({ error: true, message: "User not found" });
     }
-    console.log(`user token ${user.token}`);
-    console.log(`cookie ${refreshCookie}`);
 
     //vulnerable to timing attack
     if (refreshCookie === user.token) {
-      const newAccessToken = generateAccessToken(userPayload);
+      const { id, email } = userPayload || {};
+      const newAccessToken = generateAccessToken({ id, email });
       res.status(200).json({
         error: false,
         newAccessToken,
         message: "new access token created successfully",
       });
     } else {
-      return res
-        .status(403)
-        .json({ error: true, message: "Refresh Token doesn't match" });
+      await UserToken.deleteOne({ userId: objectID }); // this clears the user's token and we'll force the user to log in again with the error message
+      return res.status(403).json({
+        error: true,
+        message: "Refresh Token doesn't match, Please Login again",
+      });
     }
   } catch (error) {
     return res
       .status(401)
-      .json({ error: true, message: "Invalid Refresh Token" });
+      .json({ error: true, message: ` the error is ${error}` });
   }
 }

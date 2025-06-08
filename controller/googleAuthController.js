@@ -22,7 +22,7 @@ const googleAuthController = async (req, res) => {
     const { email, name, picture, sub } = payload;
 
     // find or create the user account
-    const user = await User.findOne({ email: email });
+    let user = await User.findOne({ email: email });
     if (user) {
       return res.status(409).json("User already exists");
     }
@@ -34,7 +34,7 @@ const googleAuthController = async (req, res) => {
       avatar: picture,
     };
 
-    await User.create(userObject);
+    user = await User.create(userObject);
 
     // generate tokens
     // the mongoDB objectID must be converted to String to be JSON safe and be converted back to objectID to fetch from mongoDB
@@ -48,20 +48,15 @@ const googleAuthController = async (req, res) => {
       email: user.email,
     });
 
-    console.log(accessToken);
-    console.log(refreshToken);
-
     // add the refresh token to the DB
     await UserToken.create({
       userId: user._id,
       token: refreshToken,
     });
 
-    const tokened = await UserToken.findOne({ userID: user._id });
-    console.log(tokened);
-
     // add the refresh token onto an httpOnly cookie
-    res.cookie("BLOG", refreshToken, {
+    res.cookie("BLG", refreshToken, {
+      path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
