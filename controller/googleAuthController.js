@@ -23,18 +23,17 @@ const googleAuthController = async (req, res) => {
 
     // find or create the user account
     let user = await User.findOne({ email: email });
-    if (user) {
-      return res.status(409).json("User already exists");
-    }
-    // following the user schema
-    const userObject = {
-      googleID: sub,
-      name: name,
-      email: email,
-      avatar: picture,
-    };
+    if (!user) {
+      // following the user schema
+      const userObject = {
+        googleID: sub,
+        name: name,
+        email: email,
+        avatar: picture,
+      };
 
-    user = await User.create(userObject);
+      user = await User.create(userObject);
+    }
 
     // generate tokens
     // the mongoDB objectID must be converted to String to be JSON safe and be converted back to objectID to fetch from mongoDB

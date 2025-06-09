@@ -31,6 +31,14 @@ export async function verifyRefreshToken(req, res, next) {
 
     const user = await UserToken.findOne({ userId: objectID });
     if (!user) {
+      // if no usertoken, then it means the token expired and was automatically removed
+      //since the user is going to login, the old refresh token stored has to be removed
+      res.clearCookies("BLG", {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+      });
       return res.status(403).json({ error: true, message: "User not found" });
     }
 
@@ -44,6 +52,14 @@ export async function verifyRefreshToken(req, res, next) {
         message: "new access token created successfully",
       });
     } else {
+      //since the user is going to login, the old refresh token stored has to be removed
+      res.clearCookies("BLG", {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+      });
+
       await UserToken.deleteOne({ userId: objectID }); // this clears the user's token and we'll force the user to log in again with the error message
       return res.status(403).json({
         error: true,
