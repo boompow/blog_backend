@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import UserToken from "../model/userToken.js";
+import User from "../model/user.js";
 import { generateAccessToken } from "../util/tokenFunctions.js";
 import mongoose from "mongoose";
 
@@ -29,8 +30,10 @@ export async function verifyRefreshToken(req, res, next) {
     // lets convert the String version of the user ID to mongoDB objectID to fetch userToken with userID
     const objectID = new mongoose.Types.ObjectId(userPayload.id);
 
-    const user = await UserToken.findOne({ userId: objectID });
-    if (!user) {
+    const userToken = await UserToken.findOne({ userId: objectID });
+    // the user data will also be sent and since there is no condition where the userToken could exist without the user, I'll not set a condition
+    const user = await User.findOne({ _id: objectID });
+    if (!userToken) {
       // if no usertoken, then it means the token expired and was automatically removed
       //since the user is going to login, the old refresh token stored has to be removed
       res.clearCookies("BLG", {
@@ -43,12 +46,17 @@ export async function verifyRefreshToken(req, res, next) {
     }
 
     //vulnerable to timing attack
-    if (refreshCookie === user.token) {
+    if (refreshCookie === userToken.token) {
       const { id, email } = userPayload || {};
       const newAccessToken = generateAccessToken({ id, email });
       res.status(200).json({
         error: false,
         newAccessToken,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+        },
         message: "new access token created successfully",
       });
     } else {
