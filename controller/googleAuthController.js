@@ -78,7 +78,7 @@ const googleAuthController = async (req, res) => {
   } catch (error) {
     res
       .status(400)
-      .json({ error: true, message: `invalid Google token \n ${error}` });
+      .json({ error: true, message: `invalid Google token ${error}` });
   }
 };
 

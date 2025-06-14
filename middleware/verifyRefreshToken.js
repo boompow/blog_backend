@@ -23,6 +23,12 @@ export async function verifyRefreshToken(req, res, next) {
 
     // to safeguard for a valid objectID, we'll use the following conditional
     if (!mongoose.Types.ObjectId.isValid(userPayload.id)) {
+      res.clearCookie("BLG", {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+      });
       return res
         .status(400)
         .json({ error: true, message: "invalid Refresh Token" });
@@ -36,7 +42,7 @@ export async function verifyRefreshToken(req, res, next) {
     if (!userToken) {
       // if no usertoken, then it means the token expired and was automatically removed
       //since the user is going to login, the old refresh token stored has to be removed
-      res.clearCookies("BLG", {
+      res.clearCookie("BLG", {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -56,12 +62,13 @@ export async function verifyRefreshToken(req, res, next) {
           id: user._id,
           name: user.name,
           email: user.email,
+          avatar: user.avatar,
         },
         message: "new access token created successfully",
       });
     } else {
       //since the user is going to login, the old refresh token stored has to be removed
-      res.clearCookies("BLG", {
+      res.clearCookie("BLG", {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
