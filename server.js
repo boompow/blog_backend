@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 
 import authRoute from "./routes/googleAuthRoute.js";
 import profileRoute from "./routes/profileRoute.js";
+import crudRoute from "./routes/crudRoute.js";
 
 // init the app
 const app = express();
@@ -39,6 +40,9 @@ app.use("/api/auth", authRoute);
 
 // handle profile changes
 app.use("/api/profile", profileRoute);
+
+//handle CRUD operations
+app.use("/api/blog", crudRoute);
 
 // start the server
 const PORT = process.env.PORT || 5000;
