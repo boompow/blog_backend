@@ -1,10 +1,11 @@
 import Joi from "joi";
 
 // joi schemas
+// for the content since the frontend is going to send Delta data from Quill which is a custom object we'll define the data as object().unknown(true)
 const joiBlogSchema = Joi.object({
   title: Joi.string().required().label("Title"),
-  coverImage: Joi.string().uri().label("Cover Image Link"),
-  content: Joi.string().required().label("body content"),
+  // coverImage: Joi.string().uri().label("Cover Image Link"),
+  content: Joi.object().unknown(true).required().label("body content"),
   tags: Joi.array()
     .items(
       Joi.object({
@@ -25,7 +26,7 @@ const joiBlogSchema = Joi.object({
     }),
 
   published: Joi.boolean(),
-  publishedAt: Joi.date(),
+  // publishedAt: Joi.date(),
 });
 
 const joiCommentSchema = Joi.object({
