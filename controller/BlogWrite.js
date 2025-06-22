@@ -3,7 +3,8 @@ import { joiBlogValidation } from "../util/schemaValidator.js";
 
 export default async function publishBlog(req, res) {
   try {
-    const { error, value } = joiBlogValidation(req.body);
+    console.log(req.body);
+    const { error } = joiBlogValidation(req.body);
     if (error) {
       console.log(error);
       return res
@@ -24,6 +25,7 @@ export default async function publishBlog(req, res) {
         author: blog.author,
         published: blog.published,
         timestamp: blog.publishedAt,
+        tags: blog.tags,
       },
     });
   } catch (error) {

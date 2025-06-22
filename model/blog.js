@@ -26,7 +26,7 @@ const blogSchema = new Schema(
     },
 
     content: {
-      type: String,
+      type: Schema.Types.Mixed,
       required: true,
     },
     tags: {

@@ -7,11 +7,7 @@ const joiBlogSchema = Joi.object({
   // coverImage: Joi.string().uri().label("Cover Image Link"),
   content: Joi.object().unknown(true).required().label("body content"),
   tags: Joi.array()
-    .items(
-      Joi.object({
-        tag: Joi.string().lowercase().trim().min(1).max(30),
-      })
-    )
+    .items(Joi.string().lowercase().trim().min(1).max(30))
     .required()
     .label("tags"),
   author: Joi.string()
