@@ -26,6 +26,8 @@ export default async function publishBlog(req, res) {
         published: blog.published,
         timestamp: blog.publishedAt,
         tags: blog.tags,
+        likes: blog.likes,
+        comments: blog.comments,
       },
     });
   } catch (error) {
