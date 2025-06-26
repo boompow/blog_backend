@@ -1,9 +1,10 @@
 import { Router } from "express";
-import publishBlog from "../controller/BlogWrite.js";
+import { commentWrite, publishBlog } from "../controller/BlogWrite.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 
 const router = Router();
 
-router.post("/create", verifyAccessToken, publishBlog);
+router.post("/blog", verifyAccessToken, publishBlog);
+router.post("/comment", verifyAccessToken, commentWrite);
 
 export default router;
