@@ -14,6 +14,18 @@ export async function blogRead(req, res) {
             { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: limit },
+            // this is how referencing works in MongoDB
+            {
+              $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "authorInfo",
+              },
+            },
+            {
+              $unwind: "$authorInfo",
+            },
             {
               $project: {
                 _id: 1,
@@ -21,7 +33,9 @@ export async function blogRead(req, res) {
                 slug: 1,
                 content: 1,
                 tags: 1,
-                author: 1,
+                authorName: "$authorInfo.name",
+                authorAvatar: "$authorInfo.avatar",
+                authorEmail: "$authorInfo.email",
                 published: 1,
                 publishedAt: 1,
                 likes: 1,
