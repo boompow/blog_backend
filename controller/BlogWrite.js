@@ -1,5 +1,6 @@
 import Blog from "../model/blog.js";
 import Comment from "../model/comment.js";
+import User from "../model/user.js";
 import {
   joiBlogValidation,
   joiCommentValidation,
@@ -55,6 +56,12 @@ export async function commentWrite(req, res) {
       author,
       blog,
     });
+
+    const user = await User.findOne({ id: author });
+
+    res
+      .status(200)
+      .json({ error: false, message: "comment created successfuly" });
   } catch (error) {
     return res.status(500).json({ error: true, message: error });
   }

@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import authRoute from "./routes/googleAuthRoute.js";
 import profileRoute from "./routes/profileRoute.js";
 import crudRoute from "./routes/crudRoute.js";
+import freeRoutes from "./routes/freeRoutes.js";
 
 // init the app
 const app = express();
@@ -34,6 +35,8 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.send("200! Server is running...");
 });
+
+app.use("/api/content", freeRoutes);
 
 // test google auth
 app.use("/api/auth", authRoute);

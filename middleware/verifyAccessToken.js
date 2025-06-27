@@ -22,6 +22,7 @@ export function verifyAccessToken(req, res, next) {
       return res.status(401).json({ error: true, message: message });
     }
     req.auth = payload;
+    console.log(payload);
     next();
   });
 }
