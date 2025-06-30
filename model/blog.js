@@ -61,7 +61,7 @@ const blogSchema = new Schema(
     },
 
     // Blog status
-    likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    likes: { type: Number, default: 0 },
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     views: {
       type: Number,
