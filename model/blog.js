@@ -61,8 +61,20 @@ const blogSchema = new Schema(
     },
 
     // Blog status
-    likes: { type: Number, default: 0 },
-    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+    likes: {
+      type: Number,
+      default: 0,
+    },
+    comments: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+      default: [],
+      validate: {
+        validator: function (value) {
+          return value.length <= 100;
+        },
+        message: (prop) => `${prop.path} can not exceed 100 comments per blog`,
+      },
+    },
     views: {
       type: Number,
       default: 0,

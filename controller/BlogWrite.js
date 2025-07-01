@@ -6,7 +6,7 @@ import {
   joiCommentValidation,
 } from "../util/schemaValidator.js";
 
-export async function publishBlog(req, res) {
+export async function blogWrite(req, res) {
   try {
     const { error } = joiBlogValidation(req.body);
     if (error) {
@@ -57,6 +57,8 @@ export async function commentWrite(req, res) {
       blog: blogID,
     });
 
+    console.log(newComment);
+
     // adding the comment into the blog
     await Blog.updateOne(
       { _id: blogID },
@@ -67,6 +69,7 @@ export async function commentWrite(req, res) {
       .status(200)
       .json({ error: false, message: "comment created successfuly" });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: true, message: error });
   }
 }

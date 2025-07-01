@@ -39,18 +39,26 @@ export async function blogRead(req, res) {
                 as: "commentDocs",
               },
             },
-            {
-              $unwind: {
-                path: "$commentDocs",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
 
             // lookup and unwind the comment author objectID
             {
               $lookup: {
                 from: "users",
-                let: { commentAuthorIds: "$commentDocs.author" },
+                let: {
+                  commentAuthorIds: {
+                    $filter: {
+                      input: {
+                        $map: {
+                          input: { $ifNull: ["$commentDocs", []] },
+                          as: "comment",
+                          in: { $ifNull: ["$$comment.author", null] },
+                        },
+                      },
+                      as: "commentAuthor",
+                      cond: { $ne: ["$$commentAuthor", null] },
+                    },
+                  },
+                },
                 pipeline: [
                   {
                     $match: {
@@ -74,7 +82,21 @@ export async function blogRead(req, res) {
             {
               $lookup: {
                 from: "comments",
-                let: { repliedComments: "$commentDocs.repliedComment" },
+                let: {
+                  repliedComments: {
+                    $filter: {
+                      input: {
+                        $map: {
+                          input: { $ifNull: ["$commentDocs", []] },
+                          as: "comment",
+                          in: { $ifNull: ["$$comment.repliedComment", null] },
+                        },
+                      },
+                      as: "commentReply",
+                      cond: { $ne: ["$$commentReply", null] },
+                    },
+                  },
+                },
                 pipeline: [
                   {
                     $match: {
@@ -115,23 +137,21 @@ export async function blogRead(req, res) {
             },
 
             {
-              $group: {
-                _id: "$_id",
-                title: { $first: "$title" },
-                slug: { $first: "$slug" },
-                content: { $first: "$content" },
-                tags: { $first: "$tags" },
+              $project: {
+                _id: 1,
+                title: 1,
+                slug: 1,
+                content: 1,
+                tags: 1,
                 author: {
-                  $first: {
-                    _id: "$authorInfo._id",
-                    name: "$authorInfo.name",
-                    avatar: "$authorInfo.avatar",
-                    email: "$authorInfo.email",
-                  },
+                  _id: "$authorInfo._id",
+                  name: "$authorInfo.name",
+                  avatar: "$authorInfo.avatar",
+                  email: "$authorInfo.email",
                 },
-                published: { $first: "$published" },
-                publishedAt: { $first: "$publishedAt" },
-                likes: { $first: "$likes" },
+                published: 1,
+                publishedAt: 1,
+                likes: 1,
                 comments: {
                   $map: {
                     input: "$commentDocs",
@@ -184,6 +204,7 @@ export async function blogRead(req, res) {
       },
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: true, message: "cannot fetch blog" });
   }
 }

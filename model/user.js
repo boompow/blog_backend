@@ -58,12 +58,24 @@ const userSchema = new Schema(
       default: "user",
     },
     // Blogs
-    usersBlogs: [{ type: Schema.Types.ObjectId, ref: "Blog" }],
-    savedBlogs: [{ type: Schema.Types.ObjectId, ref: "Blog" }],
+    usersBlogs: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Blog" }],
+      default: [],
+    },
+    savedBlogs: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Blog" }],
+      default: [],
+    },
 
     //   Status
-    followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    following: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    followers: {
+      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+      default: [],
+    },
+    following: {
+      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+      default: [],
+    },
   },
   {
     timestamps: true,

@@ -21,7 +21,17 @@ const commentSchema = new Schema(
       required: true,
     },
 
-    repliedComment: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+    // limiting the amount of replies to 5
+    repliedComment: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+      default: [],
+      validate: {
+        validator: function (value) {
+          return value.length <= 5;
+        },
+        message: (prop) => `${prop.path} can not exceed 5 replies`,
+      },
+    },
   },
   {
     timestamps: true,

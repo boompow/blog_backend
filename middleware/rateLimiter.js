@@ -17,9 +17,9 @@ function rateLimiter(minute, max) {
 // limiters for different operations
 const loginLimiter = rateLimiter(1, 5);
 const signupLimiter = rateLimiter(1, 2);
-const profileUpdateLimiter = rateLimiter(60, 30);
-const readLimiter = rateLimiter(1, 1000);
-const writeLimiter = rateLimiter(1, 60);
+const profileUpdateLimiter = rateLimiter(6, 1);
+const readLimiter = rateLimiter(1, 100);
+const writeLimiter = rateLimiter(1, 10);
 
 export default {
   loginLimiter,
