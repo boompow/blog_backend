@@ -42,6 +42,7 @@ export async function blogWrite(req, res) {
 }
 
 export async function commentWrite(req, res) {
+  const { comment, author, blog } = req.body;
   const { error } = joiCommentValidation(req.body);
   if (error) {
     return res
@@ -49,19 +50,16 @@ export async function commentWrite(req, res) {
       .json({ error: true, message: "Invalid Comment Format" });
   }
 
-  const { comment, authorID, blogID } = req.body;
   try {
     const newComment = await Comment.create({
-      comment: comment,
-      author: authorID,
-      blog: blogID,
+      comment,
+      author,
+      blog,
     });
-
-    console.log(newComment);
 
     // adding the comment into the blog
     await Blog.updateOne(
-      { _id: blogID },
+      { _id: blog },
       { $push: { comments: newComment._id } }
     );
 
@@ -69,30 +67,29 @@ export async function commentWrite(req, res) {
       .status(200)
       .json({ error: false, message: "comment created successfuly" });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: true, message: error });
   }
 }
 
 export async function replyWrite(req, res) {
-  const { error } = joiCommentValidation(req.body);
+  const { parentID, author, blog, comment } = req.body;
+  const { error } = joiCommentValidation({ author, blog, comment });
   if (error) {
     return res
       .status(400)
       .json({ error: true, message: "Invalid Comment Reply Format" });
   }
 
-  const { commentID, authorID, blogID, reply } = req.body;
   try {
     const newComment = await Comment.create({
-      comment: reply,
-      author: authorID,
-      blog: blogID,
+      comment,
+      author,
+      blog,
     });
 
     // adding the comment into the blog
     await Comment.updateOne(
-      { _id: commentID },
+      { _id: parentID },
       { $push: { reply: newComment._id } }
     );
 
