@@ -67,7 +67,6 @@ const blogSchema = new Schema(
     },
     comments: {
       type: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
-      default: [],
       validate: {
         validator: function (value) {
           return value.length <= 100;

@@ -90,7 +90,7 @@ export async function replyWrite(req, res) {
     // adding the comment into the blog
     await Comment.updateOne(
       { _id: parentID },
-      { $push: { reply: newComment._id } }
+      { $push: { repliedComment: newComment._id } }
     );
 
     res

@@ -24,7 +24,6 @@ const commentSchema = new Schema(
     // limiting the amount of replies to 5
     repliedComment: {
       type: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
-      default: [],
       validate: {
         validator: function (value) {
           return value.length <= 5;

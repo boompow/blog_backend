@@ -84,7 +84,7 @@ export async function blogRead(req, res) {
                 from: "comments",
                 let: {
                   repliedComments: {
-                    $filter: {
+                    $reduce: {
                       input: {
                         $map: {
                           input: { $ifNull: ["$commentDocs", []] },
@@ -92,8 +92,8 @@ export async function blogRead(req, res) {
                           in: { $ifNull: ["$$comment.repliedComment", null] },
                         },
                       },
-                      as: "commentReply",
-                      cond: { $ne: ["$$commentReply", null] },
+                      initialValue: [],
+                      in: { $setUnion: ["$$value", "$$this"] },
                     },
                   },
                 },
