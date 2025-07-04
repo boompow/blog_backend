@@ -122,7 +122,7 @@ export async function blogRead(req, res) {
                     $project: {
                       _id: 1,
                       comment: 1,
-                      timestamps: 1,
+                      createdAt: 1,
                       author: {
                         _id: "$replyAuthorInfo._id",
                         name: "$replyAuthorInfo.name",
@@ -140,6 +140,7 @@ export async function blogRead(req, res) {
               $project: {
                 _id: 1,
                 title: 1,
+                coverImage: 1,
                 slug: 1,
                 content: 1,
                 tags: 1,
@@ -159,7 +160,7 @@ export async function blogRead(req, res) {
                     in: {
                       _id: "$$comment._id",
                       comment: "$$comment.comment",
-                      publishedAt: "$$comment.timestamps",
+                      publishedAt: "$$comment.createdAt",
                       author: {
                         $arrayElemAt: [
                           {
