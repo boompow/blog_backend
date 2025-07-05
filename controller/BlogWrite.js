@@ -18,6 +18,15 @@ export async function blogWrite(req, res) {
     const { title, content, tags, author, published } = req.body;
     const blog = await Blog.create({ title, content, tags, author, published });
 
+    await User.updateOne(
+      { _id: author },
+      {
+        $push: {
+          usersBlogs: blog._id,
+        },
+      }
+    );
+
     res.status(200).json({
       error: false,
       message: "blog created successfully",

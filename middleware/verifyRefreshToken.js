@@ -4,6 +4,7 @@ import UserToken from "../model/userToken.js";
 import User from "../model/user.js";
 import { generateAccessToken } from "../util/tokenFunctions.js";
 import mongoose from "mongoose";
+import userData from "../controller/UserRead.js";
 
 // token secrets
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
@@ -55,15 +56,15 @@ export async function verifyRefreshToken(req, res, next) {
     if (refreshCookie === userToken.token) {
       const { id, email } = userPayload || {};
       const newAccessToken = generateAccessToken({ id, email });
+      const { data, error } = await userData(id);
+      if (error) {
+        return res.status(500).json(error);
+      }
+
       res.status(200).json({
         error: false,
         newAccessToken,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          avatar: user.avatar,
-        },
+        user: data,
         message: "new access token created successfully",
       });
     } else {

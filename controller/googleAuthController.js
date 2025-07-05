@@ -6,6 +6,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../util/tokenFunctions.js";
+import userData from "./UserRead.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -62,18 +63,17 @@ const googleAuthController = async (req, res) => {
       maxAge: 7 * 86400 * 1000, //7 days
     });
 
+    const { data, error } = await userData(user._id);
+    if (error) {
+      return res.status(500).json(error);
+    }
+
     // send the access token and the user data
     res.status(200).json({
       success: true,
       message: "successful",
       accessToken,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        slug: user.slug,
-      },
+      user: data,
     });
   } catch (error) {
     res

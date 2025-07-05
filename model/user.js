@@ -67,7 +67,7 @@ const userSchema = new Schema(
       default: [],
     },
 
-    //   Status
+    //  Implement Status feature in the future
     followers: {
       type: [{ type: Schema.Types.ObjectId, ref: "User" }],
       default: [],
