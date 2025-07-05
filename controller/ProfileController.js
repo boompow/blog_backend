@@ -1,64 +1,46 @@
 import User from "../model/user.js";
 import UserToken from "../model/userToken.js";
 import { joiUserValidation } from "../util/schemaValidator.js";
+import userData from "./UserRead.js";
 
 // For getting user profile
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      res.status(400).json({ error: true, message: "User not found" });
+    const { data, error } = await userData(req.body._id);
+    if (error) {
+      return res.status(500).json(error);
     }
     res.status(200).json({
       error: false,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        slug: user.slug,
-      },
+      user: data,
       message: "User Found!",
     });
   } catch (error) {
     res.status(500).json({ error: true, message: error });
   }
 };
+
 // For updating user profile
-export const updateProfile = async (req, res) => {
-  const { error } = joiUserValidation(req.body);
-
+export async function updateProfile(req, res) {
   try {
-    if (error)
-      return res
-        .status(400)
-        .json({ error: true, message: error.details[0].message });
-
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      await User.updateOne(
-        { email: req.body.email },
-        { $set: { name: req.body.name, bio: req.body.bio } }
-      );
-    } else {
-      return res.status(404).json({ error: true, message: "User not found" });
-    }
-
+    const { name, bio } = req.body;
+    await User.updateOne({ _id: req.body._id }, { $set: { name, bio } });
     return res
       .status(200)
-      .json({ error: false, message: "Profile updated successfuly!" });
+      .json({ error: false, message: "User profile updated successfully" });
   } catch (error) {
     return res
       .status(500)
-      .json({ error: true, message: "can not update profile" });
+      .json({ error: true, message: "Unable to update user profile" });
   }
-};
+}
 
 // For deleting user profile
-export const deleteProfile = async (req, res) => {
+export async function deleteProfile(req, res) {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ _id: req.body._id });
     if (user) {
-      await User.deleteOne({ email: req.body.email });
+      await User.deleteOne({ _id: req.body._id });
       await UserToken.deleteOne({ userID: user._id });
     } else {
       return res.status(404).json({ error: true, message: "User not found" });
@@ -71,6 +53,6 @@ export const deleteProfile = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: true, message: "can not delete profile" });
+      .json({ error: true, message: "Unable to delete profile" });
   }
-};
+}

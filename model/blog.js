@@ -60,7 +60,7 @@ const blogSchema = new Schema(
       default: Date.now,
     },
 
-    // Blog status
+    // Implement Blog status "Likes" in the future
     likes: {
       type: Number,
       default: 0,
