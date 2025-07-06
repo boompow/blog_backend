@@ -93,7 +93,7 @@ export async function logout(req, res) {
     await UserToken.deleteOne({ userID: user._id });
 
     return res
-      .clearCookie("BLOG", {
+      .clearCookie("BLG", {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
