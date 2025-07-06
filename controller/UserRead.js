@@ -94,6 +94,7 @@ export default async function userData(userId) {
           name: 1,
           email: 1,
           avatar: 1,
+          slug: 1,
           bio: 1,
           usersBlogs: 1,
           savedBlogs: 1,

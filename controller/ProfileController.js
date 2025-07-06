@@ -6,7 +6,8 @@ import userData from "./UserRead.js";
 // For getting user profile
 export const getProfile = async (req, res) => {
   try {
-    const { data, error } = await userData(req.body._id);
+    const user = await User.findOne({ slug: req.body.slug });
+    const { data, error } = await userData(user._id);
     if (error) {
       return res.status(500).json(error);
     }

@@ -71,6 +71,7 @@ export async function blogRead(req, res) {
                       name: 1,
                       avatar: 1,
                       email: 1,
+                      slug: 1,
                     },
                   },
                 ],
@@ -128,6 +129,7 @@ export async function blogRead(req, res) {
                         name: "$replyAuthorInfo.name",
                         avatar: "$replyAuthorInfo.avatar",
                         email: "$replyAuthorInfo.email",
+                        slug: "$replyAuthorInfo.slug",
                       },
                     },
                   },
@@ -149,6 +151,7 @@ export async function blogRead(req, res) {
                   name: "$authorInfo.name",
                   avatar: "$authorInfo.avatar",
                   email: "$authorInfo.email",
+                  slug: "$authorInfo.slug",
                 },
                 published: 1,
                 publishedAt: 1,
@@ -205,7 +208,6 @@ export async function blogRead(req, res) {
       },
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: true, message: "cannot fetch blog" });
   }
 }
