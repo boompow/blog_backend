@@ -10,7 +10,7 @@ import userData from "./UserRead.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-const googleAuthController = async (req, res) => {
+export async function googleAuthController(req, res) {
   const { token } = req.body;
 
   try {
@@ -80,6 +80,28 @@ const googleAuthController = async (req, res) => {
       .status(400)
       .json({ error: true, message: `invalid Google token ${error}` });
   }
-};
+}
 
-export default googleAuthController;
+// logout user
+export async function logout(req, res) {
+  try {
+    const user = await User.findOne({ _id: req.auth.id });
+    if (!user) {
+      return res.status(404).json({ error: true, message: "User not found" });
+    }
+
+    await UserToken.deleteOne({ userID: user._id });
+
+    return res
+      .clearCookie("BLOG", {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+      })
+      .status(200)
+      .json({ error: false, message: "Logged out successfuly!" });
+  } catch (error) {
+    return res.status(500).json({ error: true, message: "Unable to log out" });
+  }
+}

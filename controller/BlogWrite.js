@@ -16,6 +16,12 @@ export async function blogWrite(req, res) {
     }
 
     const { title, content, tags, author, published } = req.body;
+    const checkBlog = await Blog.findOne({ author, title, content });
+    if (checkBlog) {
+      return res
+        .status(409)
+        .json({ error: true, message: "Blog already created" });
+    }
     const blog = await Blog.create({ title, content, tags, author, published });
 
     await User.updateOne(

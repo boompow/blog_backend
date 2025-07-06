@@ -1,4 +1,6 @@
 import User from "../model/user.js";
+import Blog from "../model/blog.js";
+import Comment from "../model/comment.js";
 import UserToken from "../model/userToken.js";
 import { joiUserValidation } from "../util/schemaValidator.js";
 import userData from "./UserRead.js";
@@ -39,16 +41,23 @@ export async function updateProfile(req, res) {
 // For deleting user profile
 export async function deleteProfile(req, res) {
   try {
-    const user = await User.findOne({ _id: req.body._id });
-    if (user) {
-      await User.deleteOne({ _id: req.body._id });
-      await UserToken.deleteOne({ userID: user._id });
-    } else {
+    const user = await User.findOne({ _id: req.auth.id });
+    if (!user) {
       return res.status(404).json({ error: true, message: "User not found" });
     }
 
+    await User.deleteOne({ _id: req.body._id });
+    await Blog.deleteMany({ author: user._id });
+    await Comment.deleteMany({ author: user._id });
+    await UserToken.deleteOne({ userID: user._id });
+
     return res
-      .clearCookie("BLOG")
+      .clearCookie("BLOG", {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+      })
       .status(200)
       .json({ error: false, message: "Profile deleted successfuly!" });
   } catch (error) {
