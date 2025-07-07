@@ -7,9 +7,9 @@ export async function blogBookmark(req, res) {
   try {
     await User.updateOne(
       {
-        _id: req.body.userId,
+        _id: req.auth.id,
       },
-      { $push: { savedBlogs: req.body.blogId } }
+      { $push: { savedBlogs: req.body.blogID } }
     );
     return res.status(200).json({
       error: false,
@@ -28,9 +28,9 @@ export async function blogUnbookmark(req, res) {
   try {
     await User.updateOne(
       {
-        _id: req.body.userId,
+        _id: req.auth.id,
       },
-      { $pull: { savedBlogs: new ObjectId(req.body.blogId) } }
+      { $pull: { savedBlogs: new ObjectId(req.body.blogID) } }
     );
     return res.status(200).json({
       error: false,
@@ -47,21 +47,21 @@ export async function blogUnbookmark(req, res) {
 
 export async function blogDelete(req, res) {
   try {
-    const { blogId, authorId } = req.body;
+    const { blogID, authorID } = req.body;
     // using the user id from the payload we get from the access token
-    const userId = req.auth.body;
+    const userId = req.auth.id;
 
-    const blog = await Blog.findById(blogId);
+    const blog = await Blog.findById(blogID);
     if (!blog) {
       return res.status(404).json({ error: true, message: "Blog not found" });
     }
 
-    if (userId !== authorId) {
+    if (userId !== authorID) {
       return res.status(401).json({ error: true, message: "Unauthorized" });
     }
-    await Blog.deleteOne({ _id: blogId });
-    await User.updateOne({ _id: userId }, { $pull: { usersBlogs: blogId } });
-    await Comment.deleteMany({ blog: blogId });
+    await Blog.deleteOne({ _id: blogID });
+    await User.updateOne({ _id: userId }, { $pull: { usersBlogs: blogID } });
+    await Comment.deleteMany({ blog: blogID });
     return res.status(200).json({
       error: false,
       message: "Blog deleted successfully",
@@ -77,11 +77,11 @@ export async function blogDelete(req, res) {
 // the only update it will perform for now is going to be to publish drafted blogs
 export async function blogUpdate(req, res) {
   try {
-    const { blogId, authorId } = req.body;
+    const { blogID, authorID } = req.body;
     // using the user id from the payload we get from the access token
-    const userId = req.auth.body;
+    const userId = req.auth.id;
 
-    const blog = await Blog.findById(blogId);
+    const blog = await Blog.findById(blogID);
     if (!blog) {
       return res.status(404).json({ error: true, message: "Blog not found" });
     }
@@ -92,13 +92,13 @@ export async function blogUpdate(req, res) {
         .json({ error: true, message: "Draft is already published" });
     }
 
-    if (userId !== authorId) {
+    if (userId !== authorID) {
       return res.status(401).json({ error: true, message: "Unauthorized" });
     }
 
     await Blog.updateOne(
       {
-        _id: blogId,
+        _id: blogID,
       },
       { $set: { published: true } }
     );
@@ -117,18 +117,18 @@ export async function blogUpdate(req, res) {
 // comment delete
 
 export async function commentDelete(req, res) {
-  const { commentId, authorId, blogId, parentCommentId } = req.body;
+  const { commentID, authorID, blogID, parentCommentID } = req.body;
   const userId = req.auth.id;
 
   try {
-    const comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(commentID);
     if (!comment) {
       return res
         .status(404)
         .json({ error: true, message: "Comment not found" });
     }
 
-    if (userId !== authorId) {
+    if (userId !== authorID) {
       return res.status(401).json({ error: true, message: "Unauthorized" });
     }
 
@@ -137,14 +137,14 @@ export async function commentDelete(req, res) {
       await Comment.deleteMany({ _id: { $in: reply } });
     }
 
-    await Comment.deleteOne({ _id: commentId });
-    if (parentCommentId) {
+    await Comment.deleteOne({ _id: commentID });
+    if (parentCommentID) {
       await Comment.updateOne(
-        { _id: parentCommentId },
-        { $pull: { repliedComment: commentId } }
+        { _id: parentCommentID },
+        { $pull: { repliedComment: commentID } }
       );
     } else {
-      await Blog.updateOne({ _id: blogId }, { $pull: { comments: commentId } });
+      await Blog.updateOne({ _id: blogID }, { $pull: { comments: commentID } });
     }
     return res.status(200).json({
       error: false,

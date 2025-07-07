@@ -39,6 +39,7 @@ export async function blogWrite(req, res) {
       blog: {
         id: blog._id,
         title: blog.title,
+        slug: blog.slug,
         content: blog.content,
         author: blog.author,
         published: blog.published,

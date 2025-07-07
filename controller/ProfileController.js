@@ -40,19 +40,24 @@ export async function updateProfile(req, res) {
 
 // For deleting user profile
 export async function deleteProfile(req, res) {
+  const { profileID } = req.body;
+  const userID = req.auth.id;
   try {
-    const user = await User.findOne({ _id: req.auth.id });
+    if (userID !== profileID) {
+      return res.status(401).json({ error: true, message: "Unauthorized" });
+    }
+    const user = await User.findOne({ _id: userID });
     if (!user) {
       return res.status(404).json({ error: true, message: "User not found" });
     }
 
-    await User.deleteOne({ _id: req.body._id });
+    await User.deleteOne({ _id: userID });
     await Blog.deleteMany({ author: user._id });
     await Comment.deleteMany({ author: user._id });
     await UserToken.deleteOne({ userID: user._id });
 
     return res
-      .clearCookie("BLOG", {
+      .clearCookie("BLG", {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
