@@ -1,27 +1,36 @@
 import { Router } from "express";
-import {
-  commentWrite,
-  blogWrite,
-  replyWrite,
-} from "../controller/BlogWrite.js";
+import { blogWrite } from "../controller/BlogWrite.js";
 import {
   blogBookmark,
   blogUnbookmark,
-  blogUpdate,
+  publishDraft,
   blogDelete,
-  commentDelete,
+  updateBlog,
 } from "../controller/BlogUpdate.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
+import {
+  commentDelete,
+  commentWrite,
+  replyWrite,
+} from "../controller/CommentCRUD.js";
 
 const router = Router();
 
-router.post("/blog", verifyAccessToken, blogWrite);
+// blog
+router.post("/blog/create", verifyAccessToken, blogWrite);
 router.delete("/blog/delete", verifyAccessToken, blogDelete);
-router.put("/draft/publish", verifyAccessToken, blogUpdate);
-router.post("/comment", verifyAccessToken, commentWrite);
+router.put("/blog/update", verifyAccessToken, updateBlog);
+
+// draft
+router.put("/draft/publish", verifyAccessToken, publishDraft);
+
+// comment
+router.post("/comment/create", verifyAccessToken, commentWrite);
 router.delete("/comment/delete", verifyAccessToken, commentDelete);
-router.post("/reply", verifyAccessToken, replyWrite);
-router.delete("/bookmark/remove", verifyAccessToken, blogUnbookmark);
-router.post("/bookmark/save", verifyAccessToken, blogBookmark);
+router.post("/reply/create", verifyAccessToken, replyWrite);
+
+// bookmark
+router.delete("/bookmark/delete", verifyAccessToken, blogUnbookmark);
+router.post("/bookmark/create", verifyAccessToken, blogBookmark);
 
 export default router;

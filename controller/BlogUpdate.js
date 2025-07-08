@@ -75,7 +75,7 @@ export async function blogDelete(req, res) {
 }
 
 // the only update it will perform for now is going to be to publish drafted blogs
-export async function blogUpdate(req, res) {
+export async function publishDraft(req, res) {
   try {
     const { blogID, authorID } = req.body;
     // using the user id from the payload we get from the access token
@@ -105,6 +105,51 @@ export async function blogUpdate(req, res) {
     return res.status(200).json({
       error: false,
       message: "Draft published successfully",
+      blogSlug: blog.slug,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Failed to publish the draft",
+    });
+  }
+}
+
+// blog update
+export async function updateBlog(req, res) {
+  try {
+    const { blogID, title, coverImage, content, tags, published } = req.body;
+    // using the user id from the payload we get from the access token
+    const userId = req.auth.id;
+
+    const blog = await Blog.findById(blogID);
+    if (!blog) {
+      return res.status(404).json({ error: true, message: "Blog not found" });
+    }
+
+    if (userId !== blog.author) {
+      return res.status(401).json({ error: true, message: "Unauthorized" });
+    }
+
+    await Blog.updateOne(
+      {
+        _id: blogID,
+      },
+      {
+        $set: {
+          title,
+          coverImage,
+          content,
+          tags,
+          published,
+        },
+      }
+    );
+    const updatedBlog = await Blog.findById(blogID);
+    return res.status(200).json({
+      error: false,
+      message: "Draft published successfully",
+      blogSlug: updatedBlog.slug,
     });
   } catch (error) {
     return res.status(500).json({

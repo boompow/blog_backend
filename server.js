@@ -45,7 +45,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/profile", profileRoute);
 
 //handle CRUD operations
-app.use("/api/create", crudRoute);
+app.use("/api/crud", crudRoute);
 
 // start the server
 const PORT = process.env.PORT || 5000;

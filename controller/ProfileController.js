@@ -25,12 +25,21 @@ export const getProfile = async (req, res) => {
 
 // For updating user profile
 export async function updateProfile(req, res) {
+  const { name, bio, _id } = req.body;
+  const userId = req.auth.id;
   try {
-    const { name, bio } = req.body;
-    await User.updateOne({ _id: req.body._id }, { $set: { name, bio } });
+    if (_id != userId) {
+      return res.status(401).json({ error: true, message: "Unauthorized" });
+    }
+    await User.updateOne({ _id: _id }, { $set: { name, bio } });
+    const data = await userData(_id);
     return res
       .status(200)
-      .json({ error: false, message: "User profile updated successfully" });
+      .json({
+        error: false,
+        message: "User profile updated successfully",
+        user: data,
+      });
   } catch (error) {
     return res
       .status(500)
