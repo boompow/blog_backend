@@ -15,8 +15,7 @@ export async function blogBookmark(req, res) {
       error: false,
       message: "blog saved successfully",
     });
-  } catch (error) {
-    console.log(error);
+  } catch {
     return res.status(500).json({
       error: true,
       message: "Unable to save the Blog to for the User",
@@ -36,8 +35,7 @@ export async function blogUnbookmark(req, res) {
       error: false,
       message: "blog unsaved successfully",
     });
-  } catch (error) {
-    console.log(error);
+  } catch {
     return res.status(500).json({
       error: true,
       message: "Unable to save the Blog to for the User",
@@ -66,7 +64,7 @@ export async function blogDelete(req, res) {
       error: false,
       message: "Blog deleted successfully",
     });
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       error: true,
       message: "Failed to delete blog",
@@ -77,7 +75,7 @@ export async function blogDelete(req, res) {
 // the only update it will perform for now is going to be to publish drafted blogs
 export async function publishDraft(req, res) {
   try {
-    const { blogID, authorID } = req.body;
+    const { blogID } = req.body;
     // using the user id from the payload we get from the access token
     const userId = req.auth.id;
 
@@ -92,7 +90,7 @@ export async function publishDraft(req, res) {
         .json({ error: true, message: "Draft is already published" });
     }
 
-    if (userId !== authorID) {
+    if (userId.toString() !== blog.author.toString()) {
       return res.status(401).json({ error: true, message: "Unauthorized" });
     }
 
@@ -107,7 +105,7 @@ export async function publishDraft(req, res) {
       message: "Draft published successfully",
       blogSlug: blog.slug,
     });
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       error: true,
       message: "Failed to publish the draft",
@@ -127,7 +125,7 @@ export async function updateBlog(req, res) {
       return res.status(404).json({ error: true, message: "Blog not found" });
     }
 
-    if (userId !== blog.author) {
+    if (userId.toString() !== blog.author.toString()) {
       return res.status(401).json({ error: true, message: "Unauthorized" });
     }
 
@@ -148,57 +146,13 @@ export async function updateBlog(req, res) {
     const updatedBlog = await Blog.findById(blogID);
     return res.status(200).json({
       error: false,
-      message: "Draft published successfully",
+      message: "Blog updated successfully",
       blogSlug: updatedBlog.slug,
     });
-  } catch (error) {
+  } catch {
     return res.status(500).json({
       error: true,
-      message: "Failed to publish the draft",
-    });
-  }
-}
-
-// comment delete
-
-export async function commentDelete(req, res) {
-  const { commentID, authorID, blogID, parentCommentID } = req.body;
-  const userId = req.auth.id;
-
-  try {
-    const comment = await Comment.findById(commentID);
-    if (!comment) {
-      return res
-        .status(404)
-        .json({ error: true, message: "Comment not found" });
-    }
-
-    if (userId !== authorID) {
-      return res.status(401).json({ error: true, message: "Unauthorized" });
-    }
-
-    const reply = comment.repliedComment || [];
-    if (reply.length > 0) {
-      await Comment.deleteMany({ _id: { $in: reply } });
-    }
-
-    await Comment.deleteOne({ _id: commentID });
-    if (parentCommentID) {
-      await Comment.updateOne(
-        { _id: parentCommentID },
-        { $pull: { repliedComment: commentID } }
-      );
-    } else {
-      await Blog.updateOne({ _id: blogID }, { $pull: { comments: commentID } });
-    }
-    return res.status(200).json({
-      error: false,
-      message: "Comment deleted successfully",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      message: "Failed to delete comment",
+      message: "Failed to update the blog",
     });
   }
 }
