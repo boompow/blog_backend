@@ -12,7 +12,6 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export async function googleAuthController(req, res) {
   const { token } = req.body;
-  console.log("token", token);
 
   try {
     // getting the payload from the google token
