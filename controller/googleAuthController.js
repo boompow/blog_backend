@@ -60,7 +60,7 @@ export async function googleAuthController(req, res) {
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+      sameSite: "none",
       maxAge: 7 * 86400 * 1000, //7 days
     });
 
