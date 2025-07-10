@@ -60,7 +60,7 @@ export async function googleAuthController(req, res) {
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: "None",
       maxAge: 7 * 86400 * 1000, //7 days
     });
 
@@ -98,7 +98,7 @@ export async function logout(req, res) {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+        sameSite: "None",
       })
       .status(200)
       .json({ error: false, message: "Logged out successfuly!" });

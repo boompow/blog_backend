@@ -31,7 +31,7 @@ export async function verifyRefreshToken(req, res) {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+        sameSite: "None",
       });
       return res
         .status(400)
@@ -50,7 +50,7 @@ export async function verifyRefreshToken(req, res) {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+        sameSite: "None",
       });
       return res.status(403).json({
         error: true,
@@ -82,7 +82,7 @@ export async function verifyRefreshToken(req, res) {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+        sameSite: "None",
         maxAge: 7 * 86400 * 1000, //7 days
       });
 
@@ -98,7 +98,7 @@ export async function verifyRefreshToken(req, res) {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+        sameSite: "None",
       });
 
       await UserToken.deleteOne({ userId: objectID }); // this clears the user's token and we'll force the user to log in again with the error message
