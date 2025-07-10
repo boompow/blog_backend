@@ -2,14 +2,17 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import UserToken from "../model/userToken.js";
 import User from "../model/user.js";
-import { generateAccessToken } from "../util/tokenFunctions.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../util/tokenFunctions.js";
 import mongoose from "mongoose";
 import userData from "../controller/UserRead.js";
 
 // token secrets
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-export async function verifyRefreshToken(req, res, next) {
+export async function verifyRefreshToken(req, res) {
   const refreshCookie = req.cookies.BLG;
 
   if (!refreshCookie) {
@@ -37,9 +40,9 @@ export async function verifyRefreshToken(req, res, next) {
     // lets convert the String version of the user ID to mongoDB objectID to fetch userToken with userID
     const objectID = new mongoose.Types.ObjectId(userPayload.id);
 
-    const userToken = await UserToken.findOne({ userId: objectID });
+    const userToken = await UserToken.findOne({ userId: userPayload.id });
     // the user data will also be sent and since there is no condition where the userToken could exist without the user, I'll not set a condition
-    const user = await User.findOne({ _id: objectID });
+    // const user = await User.findOne({ _id: objectID });
     if (!userToken) {
       // if no usertoken, then it means the token expired and was automatically removed
       //since the user is going to login, the old refresh token stored has to be removed
@@ -49,17 +52,39 @@ export async function verifyRefreshToken(req, res, next) {
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
       });
-      return res.status(403).json({ error: true, message: "User not found" });
+      return res.status(403).json({
+        error: true,
+        message: "Refresh token expired or invalid. Please log in again.",
+      });
     }
 
-    //vulnerable to timing attack
-    if (refreshCookie === userToken.token) {
+    // now lets check if the refreshcookie matches that from the DB
+    const checkToken = await UserToken.findOne({
+      userId: objectID,
+      token: refreshCookie,
+    });
+
+    if (checkToken) {
       const { id, email } = userPayload || {};
       const newAccessToken = generateAccessToken({ id, email });
       const { data, error } = await userData(id);
       if (error) {
         return res.status(500).json(error);
       }
+
+      // rotate refersh token
+      const newRefreshToken = generateRefreshToken({ id, email });
+      await UserToken.findOneAndUpdate(
+        { userId: objectID },
+        { $set: { token: newRefreshToken } }
+      );
+      res.cookie("BLG", newRefreshToken, {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+        maxAge: 7 * 86400 * 1000, //7 days
+      });
 
       res.status(200).json({
         error: false,

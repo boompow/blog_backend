@@ -49,6 +49,7 @@ export async function googleAuthController(req, res) {
     });
 
     // add the refresh token to the DB
+    await UserToken.findOneAndDelete({ userId: user._id });
     await UserToken.create({
       userId: user._id,
       token: refreshToken,
@@ -90,7 +91,7 @@ export async function logout(req, res) {
       return res.status(404).json({ error: true, message: "User not found" });
     }
 
-    await UserToken.deleteOne({ userID: user._id });
+    await UserToken.deleteOne({ userId: user._id });
 
     return res
       .clearCookie("BLG", {
